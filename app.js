@@ -5,20 +5,17 @@ const cors = require('cors');
 const app = express();
 const port = 3000;
 
-app.use(cors({
-    origin: 'http://localhost:3000', // Especifique a URL do seu front-end
-    methods: 'GET,POST,PUT,DELETE', // Permite apenas os métodos necessários
-    allowedHeaders: 'Content-Type,Authorization'
-}));
+app.use(cors());
 // Configuração da conexão com o PostgreSQL
 const pool = new Pool({
-    host: 'ep-dry-dawn-a5k50ozh.us-east-2.aws.neon.tech',
-    database: 'tickets_zendesk',
-    user: 'tickets_zendesk_owner',
-    password: 'ISyDqw4GxaV3',
-    port: '5432',
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    port: process.env.DB_PORT,
     ssl: { rejectUnauthorized: false }
 });
+
 
 // Endpoint para consulta de tickets por ticket_id (busca direta)
 app.get('/tickets/search/:ticket_id', async (req, res) => {
