@@ -5,7 +5,11 @@ const cors = require('cors');
 const app = express();
 const port = 3000;
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000', // Especifique a URL do seu front-end
+    methods: 'GET,POST,PUT,DELETE', // Permite apenas os métodos necessários
+    allowedHeaders: 'Content-Type,Authorization'
+}));
 // Configuração da conexão com o PostgreSQL
 const pool = new Pool({
     host: 'ep-dry-dawn-a5k50ozh.us-east-2.aws.neon.tech',
