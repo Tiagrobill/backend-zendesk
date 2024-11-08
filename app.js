@@ -6,6 +6,7 @@ const app = express();
 const port = 3000;
 
 app.use(cors());
+
 // Configuração da conexão com o PostgreSQL
 const pool = new Pool({
     host: process.env.DB_HOST,
@@ -16,10 +17,9 @@ const pool = new Pool({
     ssl: { rejectUnauthorized: false }
 });
 
-
 // Endpoint para consulta de tickets por ticket_id (busca direta)
 app.get('/tickets/search/:ticket_id', async (req, res) => {
-    const { ticket_id } = req.params; // Obtém o `ticket_id` da URL
+    const { ticket_id } = req.params;
     try {
         const result = await pool.query(
             `SELECT ticket_id, STRING_AGG(chat_content, '\n' ORDER BY id) AS chat_content
@@ -39,14 +39,14 @@ app.get('/tickets/search/:ticket_id', async (req, res) => {
     }
 });
 
-// Endpoint para busca genérica (pode buscar por ticket_id ou por termo de pesquisa)
+// Endpoint para busca genérica (pode buscar por ticket_id, termo de pesquisa ou número de pedido)
 app.get('/tickets/search', async (req, res) => {
-    const { ticket_id, query } = req.query;  // Aqui agora aceitamos 'ticket_id' ou 'query'
+    const { ticket_id, query, orderNumber } = req.query;
 
     try {
         let result;
         if (ticket_id) {
-            // Se 'ticket_id' for passado na query, busca diretamente pelo ticket_id
+            // Busca diretamente pelo ticket_id
             result = await pool.query(
                 `SELECT ticket_id, STRING_AGG(chat_content, '\n' ORDER BY id) AS chat_content
                 FROM tickets
@@ -54,8 +54,17 @@ app.get('/tickets/search', async (req, res) => {
                 GROUP BY ticket_id`,
                 [ticket_id]
             );
+        } else if (orderNumber) {
+            // Busca pelo número de pedido no chat_content
+            result = await pool.query(
+                `SELECT ticket_id, STRING_AGG(chat_content, '\n' ORDER BY id) AS chat_content
+                FROM tickets
+                WHERE chat_content ILIKE $1
+                GROUP BY ticket_id`,
+                [`%${orderNumber}%`]
+            );
         } else if (query) {
-            // Se for um termo de pesquisa, busca por 'query' (nome, CPF, CNPJ) no chat_content
+            // Busca por termo de pesquisa (nome, CPF, CNPJ) no chat_content
             result = await pool.query(
                 `SELECT ticket_id, STRING_AGG(chat_content, '\n' ORDER BY id) AS chat_content
                 FROM tickets
