@@ -1,0 +1,20 @@
+{
+  "name": "ticket-search-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "csv-parser": "^3.0.0",
+    "express": "^4.21.1",
+    "fast-csv": "^5.0.2",
+    "pg": "^8.13.1",
+    "@vercel/node": "^2.0.0"
+  }
+}
